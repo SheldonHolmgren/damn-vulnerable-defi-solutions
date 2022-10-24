@@ -3,6 +3,7 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
+import "hardhat/console.sol";
 
 /**
  * @title ClimberTimelock
@@ -85,6 +86,8 @@ contract ClimberTimelock is AccessControl {
         require(getOperationState(id) == OperationState.Unknown, "Operation already known");
         
         operations[id].readyAtTimestamp = uint64(block.timestamp) + delay;
+        console.log("Sccheduling op at timestamp: %s, current timestamp: %s", operations[id].readyAtTimestamp, block.timestamp);
+        console.log("id=%s", uint256(id));
         operations[id].known = true;
     }
 
@@ -105,6 +108,8 @@ contract ClimberTimelock is AccessControl {
             targets[i].functionCallWithValue(dataElements[i], values[i]);
         }
         
+        console.log("id=%s", uint256(id));
+        console.log("getOperationState:", uint8(getOperationState(id)));
         require(getOperationState(id) == OperationState.ReadyForExecution);
         operations[id].executed = true;
     }
